@@ -1,0 +1,9 @@
+{
+    "name": "sidebar-plus",
+    "title": "Sidebar Plus",
+    "version": "1.0.0",
+    "files": [
+        "main.js",
+        "README.md"
+    ]
+}
