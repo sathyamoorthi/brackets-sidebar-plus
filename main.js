@@ -9,7 +9,14 @@ $(".horz-resizer").on("mouseenter", OpenSidebar);
 $(".content").on("mouseenter", CollapseSidebar);
 $(document).on("mouseleave", CollapseSidebar);
 $("#sidebar").on("panelExpanded", ShowSlectionTriangle);    
+$("#sidebar").on("panelCollapsed", PanelCollapsed);    
 $(".content").css("background-color", "#ffffff");
+    
+function PanelCollapsed()
+{
+    $(".sidebar-selection-triangle").css("display", "none");
+    $("#project-files-container").find(".scroller-shadow").css("display", "none");
+}
 
 function OpenSidebar() 
 {    
@@ -35,8 +42,7 @@ function CollapseSidebar()
     if (sidebar.attr("data-mover-show") == "true") 
     {        
         hrz.css("display", "block");          
-        $(".sidebar-selection-triangle").css("display", "none");
-        $("#project-files-container").find(".scroller-shadow").css("display", "none");
+        PanelCollapsed();
         content.stop();
         
         content.animate({left: 0}, 250, function() {            
