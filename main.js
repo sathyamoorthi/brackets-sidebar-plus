@@ -3,19 +3,20 @@
 
 //To know more about this extension, use "Show Developer Tools". Understanding the role of .horz-resizer, .content, #sidebar are mandatory.
 define(function (require, exports, module) {
-    "use strict";     
+    "use strict";   
 
 $(".horz-resizer").on("mouseenter", OpenSidebar);
 $(".content").on("mouseenter", CollapseSidebar);
 $(document).on("mouseleave", CollapseSidebar);
 $("#sidebar").on("panelExpanded", ShowSlectionTriangle);    
+$(".content").css("background-color", "#ffffff");
 
 function OpenSidebar() 
 {    
     var sidebar = $("#sidebar"), hrz = $(".horz-resizer"), content = $(".content");
 
     if (hrz.parent().hasClass("sidebar") == false && content.is(':animated') == false) 
-    {
+    {        
         sidebar.css("display", "-webkit-box");         
         hrz.css("display", "none");
         
