@@ -4,6 +4,13 @@
 //To know more about this extension, use "Show Developer Tools". Understanding the role of .horz-resizer, .content, #sidebar are mandatory.
 define(function (require, exports, module) {
     "use strict";   
+    
+$.extend($.easing,
+{
+    easeOutQuart: function (x, t, b, c, d) {
+        return -c * ((t=t/d-1)*t*t*t - 1) + b;
+    }
+});
 
 $(".horz-resizer").on("mouseenter", OpenSidebar);
 $(".content").on("mouseenter", CollapseSidebar);
@@ -27,7 +34,7 @@ function OpenSidebar()
         sidebar.css("display", "-webkit-box");         
         hrz.css("display", "none");
         
-        content.animate({left: ((sidebar.width() > 0) ? sidebar.width() : 200)}, 250, function()
+        content.animate({left: ((sidebar.width() > 0) ? sidebar.width() : 200)}, 400, "easeOutQuart", function()
                         {
                                 sidebar.attr("data-mover-show", true);
                                 ShowSlectionTriangle();
@@ -45,7 +52,7 @@ function CollapseSidebar()
         PanelCollapsed();
         content.stop();
         
-        content.animate({left: 0}, 250, function() {            
+        content.animate({left: 0}, 400, "easeOutQuart", function() {            
             sidebar.removeAttr("data-mover-show", true);
             sidebar.css("display", "none");
         });
