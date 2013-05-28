@@ -1,7 +1,10 @@
 {
     "name": "sidebar-plus",
     "title": "Sidebar Plus",
+    "description": "Hide sidebar using View->Hide Sidebar / Ctrl+Shift+H. This extension will help you to access sidebar immediately, using HOVER at the left corner",
+    "homepage": "https://github.com/sathyamoorthi/brackets-sidebar-plus",
     "version": "1.0.0",
+    "author": "Sathyamoorthi<sathyamoorthi10@gmail.com>",
     "files": [
         "main.js",
         "README.md"
