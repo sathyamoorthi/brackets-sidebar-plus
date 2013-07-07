@@ -65,8 +65,13 @@ define(function (require, exports, module) {
             });
         }
     }
+    
+    $(document).mousemove(function (e) {
+        if (e.pageX <= 60 && window.getSelection().toString().length === 0) {
+            openSidebar();
+        }
+    });
 
-    $(".horz-resizer").on("mouseenter", openSidebar);
     $(".content").on("mouseenter", collapseSidebar);
     $(document).on("mouseleave", collapseSidebar);
     $("#sidebar").on("panelExpanded", panelExpanded);
