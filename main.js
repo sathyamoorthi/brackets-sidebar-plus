@@ -13,16 +13,17 @@ define(function (require, exports, module) {
     });
 
     //We should hide selection triangle and scroller shadows before doing any animation, else they will stand out in animation.
+
     function panelCollapsed() {
         $(".sidebar-selection-triangle").css("display", "none");
         $("#sidebar").find(".scroller-shadow").css("display", "none");
     }
 
     function panelExpanded() {
-        
+
         //bring scroller shadows to view.
         $("#sidebar").find(".scroller-shadow").css("display", "block");
-        
+
         //We have 2 selection triangles. One for working-set and another one for project-files. We should show triangle which is currently selected by user.
         $(".sidebar-selection").filter(function () {
             return $(this).css("display") === "block";
@@ -37,11 +38,11 @@ define(function (require, exports, module) {
         if (hrz.parent().hasClass("sidebar") === false && content.is(':animated') === false) {
             sidebar.css("display", "-webkit-box");
             hrz.css("display", "none");
+            sidebar.attr("data-hover-show", true);
 
             content.animate({
                 left: ((sidebar.width() > 0) ? sidebar.width() : 200)
             }, 350, "easeOutCubic", function () {
-                sidebar.attr("data-mover-show", true);
                 panelExpanded();
             });
         }
@@ -52,7 +53,7 @@ define(function (require, exports, module) {
             hrz = $(".horz-resizer"),
             content = $(".content");
 
-        if (sidebar.attr("data-mover-show") === "true") {
+        if (sidebar.attr("data-hover-show") === "true") {
             hrz.css("display", "block");
             panelCollapsed();
             content.stop();
@@ -60,13 +61,18 @@ define(function (require, exports, module) {
             content.animate({
                 left: 0
             }, 350, "easeOutCubic", function () {
-                sidebar.removeAttr("data-mover-show", true);
+                sidebar.removeAttr("data-hover-show", true);
                 sidebar.css("display", "none");
             });
         }
     }
 
-    $(".horz-resizer").on("mouseenter", openSidebar);
+    $(document).mousemove(function (e) {
+        if (e.pageX <= 35 && !$("#sidebar").attr("data-hover-show")) {
+            openSidebar();
+        }
+    });
+
     $(".content").on("mouseenter", collapseSidebar);
     $(document).on("mouseleave", collapseSidebar);
     $("#sidebar").on("panelExpanded", panelExpanded);
