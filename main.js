@@ -100,13 +100,17 @@ define(function (require, exports, module) {
         }
     }
 
-    $(".content").on("click", collapseSidebar);
-    
-    $(".main-view").on("click", function (event) {
-        if (event.pageX < 19 && $("#sidebar").is(":visible") === false) {
-            openSidebar();
-        }
-    });
+	$(".main-view").on("mousemove", function (event) {
+		if (event.pageX < 19 && $("#sidebar").is(":visible") === false) {
+			openSidebar();
+		}
+	});
+
+	$("#sidebar").on("mouseleave", function (event) {
+		if ($("#sidebar").is(":visible") === true) {
+			collapseSidebar();
+		}
+	});
     
     $("#sidebar").on("panelExpanded", function () {
         panelExpanded();
