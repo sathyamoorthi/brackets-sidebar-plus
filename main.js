@@ -55,15 +55,22 @@ define(function (require, exports, module) {
     }
     
     function panelCollapsed() {
-        $(".horz-resizer").css("display", "none");
+        $(".horz-resizer:first").css("display", "none");
         $(".content").css("left", "20px");
         $("#sidebar").css("display", "none");
         
+        resetSplitViewResizerPosition();
     }
 
     function panelExpanded() {
-        $(".horz-resizer").css("display", "block");
+        $(".horz-resizer:first").css("display", "block");
         $("#sidebar").css("display", "-webkit-box");
+    }
+    
+    function resetSplitViewResizerPosition() {
+        var $firstPane = $("#first-pane");
+        
+        $firstPane.find(".horz-resizer").css("left", $firstPane.width() + "px");
     }
 
     function openSidebar() {
@@ -79,6 +86,7 @@ define(function (require, exports, module) {
                 left: ((sidebar.width() > 0) ? sidebar.width() : 200)
             }, 350, "easeOutCubic", function () {
                 showShadowsAndTriangle(true);
+                resetSplitViewResizerPosition();
             });
         }
     }
