@@ -84,7 +84,7 @@ define(function (require, exports, module) {
             
             content.animate({
                 left: ((sidebar.width() > 0) ? sidebar.width() : 200)
-            }, 350, "easeOutCubic", function () {
+            }, 200, "easeOutCubic", function () {
                 showShadowsAndTriangle(true);
                 resetSplitViewResizerPosition();
             });
@@ -101,20 +101,24 @@ define(function (require, exports, module) {
             
             content.animate({
                 left: 20
-            }, 350, "easeOutCubic", function () {
+            }, 200, "easeOutCubic", function () {
                 panelCollapsed();
                 sidebar.removeAttr("data-hover-show", true);
             });
         }
     }
 
-    $(".content").on("click", collapseSidebar);
-    
-    $(".main-view").on("click", function (event) {
-        if (event.pageX < 19 && $("#sidebar").is(":visible") === false) {
-            openSidebar();
-        }
-    });
+	$(".main-view").on("mousemove", function (event) {
+		if (event.pageX < 19 && $("#sidebar").is(":visible") === false) {
+			openSidebar();
+		}
+	});
+
+	$("#sidebar").on("mouseleave", function (event) {
+		if ($("#sidebar").is(":visible") === true) {
+			collapseSidebar();
+		}
+	});
     
     $("#sidebar").on("panelExpanded", function () {
         panelExpanded();
