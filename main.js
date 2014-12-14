@@ -1,27 +1,3 @@
-/*
-The MIT License (MIT)
-
-Copyright (c) 2013 Sathyamoorthi <sathyamoorthi10@gmail.com>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define, $, brackets, window, document, clearTimeout, setTimeout */
 
@@ -29,111 +5,80 @@ SOFTWARE.
 define(function (require, exports, module) {
     "use strict";
     
-    var AppInit = brackets.getModule("utils/AppInit");
-
-    $.extend($.easing, {
-        def: 'easeOutCubic',
-        easeOutCubic: function (x, t, b, c, d) {
-            return c * ((t = t / d - 1) * t * t + 1) + b;
-        }
-    });
-   
-    function showShadowsAndTriangle(show) {
-        if (show) {
-            //bring scroller shadows to view.
-            $("#sidebar").find(".scroller-shadow").css("display", "block");
-            
-            //We have 2 selection triangles. One for working-set and another one for project-files. We should show triangle which is currently selected by user.
-            $(".sidebar-selection").filter(function () {
-                return $(this).css("display") === "block";
-            }).parent().find(".sidebar-selection-triangle").css("display", "block");
-            
-        } else {  //We should hide selection triangle and scroller shadows before doing any animation, else they will stand out in animation.            
-            $(".sidebar-selection-triangle").css("display", "none");
-            $("#sidebar").find(".scroller-shadow").css("display", "none");
-        }
-    }
+    var AppInit                     = brackets.getModule("utils/AppInit"),
+        ExtensionUtils              = brackets.getModule("utils/ExtensionUtils"),
+        sideBarPlusActive           = false,
+        sideBarWidthBeforeCollapse  = 200,
+        $sidebar                    = $("#sidebar"),
+        $content                    = $(".content"),
+        $mainView                   = $(".main-view");
     
     function panelCollapsed() {
-        $(".horz-resizer:first").css("display", "none");
-        $(".content").css("left", "20px");
-        $("#sidebar").css("display", "none");
-        
-        resetSplitViewResizerPosition();
+        if ($sidebar.width() > 0) {
+            sideBarWidthBeforeCollapse = $sidebar.width();
+
+            $(".horz-resizer:first").css("display", "none");
+            $content .css("left", "20px");
+            $sidebar.find(".sidebar-selection-extension").css("display", "none");
+            $sidebar.find(".scroller-shadow").css("display", "none");
+            $sidebar.css("position", "fixed").css("width", "0px").addClass("sidebar-plus-collapse");
+        }
     }
 
     function panelExpanded() {
-        $(".horz-resizer:first").css("display", "block");
-        $("#sidebar").css("display", "-webkit-box");
-    }
-    
-    function resetSplitViewResizerPosition() {
-        var $firstPane = $("#first-pane");
-        
-        $firstPane.find(".horz-resizer").css("left", $firstPane.width() + "px");
-    }
+        sideBarWidthBeforeCollapse = sideBarWidthBeforeCollapse < 150 ? 150 : sideBarWidthBeforeCollapse;
 
-    function openSidebar() {
-        var sidebar = $("#sidebar"),
-            content = $(".content");
+        $(".horz-resizer:first").css("display", "block").css("z-index", 150).css("left", sideBarWidthBeforeCollapse + "px");
 
-        if (content.is(':animated') === false) {
-            sidebar.css("display", "-webkit-box");
-            sidebar.attr("data-hover-show", true);
-            panelExpanded();
-            
-            content.animate({
-                left: ((sidebar.width() > 0) ? sidebar.width() : 200)
-            }, 350, "easeOutCubic", function () {
-                showShadowsAndTriangle(true);
-                resetSplitViewResizerPosition();
-            });
-        }
+        $sidebar.css("display", "-webkit-box").css("width", sideBarWidthBeforeCollapse + "px");
+        $sidebar.find(".sidebar-selection-extension").css("display", "block");
+        $sidebar.find(".scroller-shadow").css("display", "block"); 
     }
 
-    function collapseSidebar() {
-        var sidebar = $("#sidebar"),
-            content = $(".content");
-        
-        if (sidebar.attr("data-hover-show") === "true") {
-            showShadowsAndTriangle(false);
-            content.stop();
-            
-            content.animate({
-                left: 20
-            }, 350, "easeOutCubic", function () {
-                panelCollapsed();
-                sidebar.removeAttr("data-hover-show", true);
-            });
-        }
-    }
-
-    $(".content").on("click", collapseSidebar);
-    
-    $(".main-view").on("click", function (event) {
-        if (event.pageX < 19 && $("#sidebar").is(":visible") === false) {
-            openSidebar();
-        }
-    });
-    
-    $("#sidebar").on("panelExpanded", function () {
-        panelExpanded();
-        showShadowsAndTriangle(true);
-    });
-    
-    $("#sidebar").on("panelCollapsed", function () {
-        panelCollapsed();
-        showShadowsAndTriangle(false);
-    });
-    
-    $(".main-view").css("background-color", "#3F3F3F");
-    $(".content").css("background-color", "#ffffff");
-    
-    AppInit.appReady(function () {
-        if ($("#sidebar").is(":visible") === false) {
+    $content.on("click", function(event) {
+        if (sideBarPlusActive) {
             panelCollapsed();
-            showShadowsAndTriangle(true);
         }
     });
     
+    $mainView.on("click", function (event) {
+        if (event.pageX < 19 && $sidebar.width() === 0) {
+            sideBarPlusActive = true;
+            panelExpanded();
+        }
+    });
+    
+    $sidebar.on("panelExpanded", function () {
+        sideBarPlusActive = false;
+        $sidebar.css("position", "absolute").removeClass("sidebar-plus-collapse");
+        panelExpanded();
+    });
+    
+    $sidebar.on("panelCollapsed", function () {
+        panelCollapsed();
+    });
+
+    $sidebar.on("panelResizeUpdate", function (event, size) {
+        if (sideBarPlusActive) {
+            $(".content").css("left", "20px");
+            $("#first-pane").prev(".horz-resizer").css("left", $("#first-pane").width() + "px")
+        }
+    });
+
+    $sidebar.bind("transitionend", function() {
+        if ($sidebar.width() === 0) {
+            $sidebar.css("display", "none");
+        }
+    });
+
+    $mainView.css("background-color", "#3F3F3F");
+    $content.css("background-color", "#ffffff");
+
+    AppInit.appReady(function () {
+        ExtensionUtils.loadStyleSheet(module, "css/main.css");
+
+        if ($sidebar.is(":visible") === false) {
+            panelCollapsed();            
+        }
+    });
 });

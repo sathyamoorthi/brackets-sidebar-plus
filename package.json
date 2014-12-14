@@ -1,12 +1,15 @@
 {
     "name": "sidebar-plus",
     "title": "Sidebar Plus",
-    "description": "Hide sidebar using View->Hide Sidebar Or Ctrl+Shift+H. For immediate access, click at the left corner to open it and click on editor to collapse it",
+    "description": "Hide sidebar using View->Hide Sidebar Or Ctrl+Alt+H. For immediate access, click at the left corner to open it and click on editor to collapse it",
     "homepage": "https://github.com/sathyamoorthi/brackets-sidebar-plus",
-    "version": "1.0.1",
+    "version": "2.0.0",
     "author": "Sathyamoorthi<sathyamoorthi10@gmail.com>",
     "files": [
         "main.js",
         "README.md"
-    ]
+    ],
+    "engines": {
+        "brackets": ">0.27.0"
+    }
 }

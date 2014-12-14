@@ -1,0 +1,6 @@
+.sidebar-plus-collapse
+{
+    z-index: 100;
+    -webkit-transition: width 0.2s ease-in-out;
+    transition: width 0.2s ease-in-out;
+}
