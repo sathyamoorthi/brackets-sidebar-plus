@@ -1,79 +1,117 @@
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
-/*global define, $, brackets, window, document, clearTimeout, setTimeout */
+/*
+The MIT License (MIT)
 
-//To know more about this extension, use "Show Developer Tools". Understanding the role of .horz-resizer, .content, #sidebar are mandatory.
+Copyright (c) 2013-14 Sathyamoorthi <sathyamoorthi10@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+/*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
+/*global define, $, brackets, window, document */
+
 define(function (require, exports, module) {
     "use strict";
     
     var AppInit                     = brackets.getModule("utils/AppInit"),
         ExtensionUtils              = brackets.getModule("utils/ExtensionUtils"),
+        PreferencesManager          = brackets.getModule("preferences/PreferencesManager"),
         sideBarPlusActive           = false,
-        sideBarWidthBeforeCollapse  = 200,
+        sideBarCollapse             = false,
         $sidebar                    = $("#sidebar"),
         $content                    = $(".content"),
-        $mainView                   = $(".main-view");
-    
-    function panelCollapsed() {
-        if ($sidebar.width() > 0) {
-            sideBarWidthBeforeCollapse = $sidebar.width();
-
-            $(".horz-resizer:first").css("display", "none");
-            $content .css("left", "20px");
-            $sidebar.find(".sidebar-selection-extension").css("display", "none");
-            $sidebar.find(".scroller-shadow").css("display", "none");
-            $sidebar.css("position", "fixed").css("width", "0px").addClass("sidebar-plus-collapse");
-        }
-    }
-
-    function panelExpanded() {
-        sideBarWidthBeforeCollapse = sideBarWidthBeforeCollapse < 150 ? 150 : sideBarWidthBeforeCollapse;
-
-        $(".horz-resizer:first").css("display", "block").css("z-index", 150).css("left", sideBarWidthBeforeCollapse + "px");
-
-        $sidebar.css("display", "-webkit-box").css("width", sideBarWidthBeforeCollapse + "px");
-        $sidebar.find(".sidebar-selection-extension").css("display", "block");
-        $sidebar.find(".scroller-shadow").css("display", "block"); 
-    }
-
-    $content.on("click", function(event) {
-        if (sideBarPlusActive) {
-            panelCollapsed();
-        }
-    });
-    
-    $mainView.on("click", function (event) {
-        if (event.pageX < 19 && $sidebar.width() === 0) {
-            sideBarPlusActive = true;
-            panelExpanded();
-        }
-    });
-    
-    $sidebar.on("panelExpanded", function () {
-        sideBarPlusActive = false;
-        $sidebar.css("position", "absolute").removeClass("sidebar-plus-collapse");
-        panelExpanded();
-    });
-    
-    $sidebar.on("panelCollapsed", function () {
-        panelCollapsed();
-    });
-
-    $sidebar.on("panelResizeUpdate", function (event, size) {
-        if (sideBarPlusActive) {
-            $(".content").css("left", "20px");
-            $("#first-pane").prev(".horz-resizer").css("left", $("#first-pane").width() + "px")
-        }
-    });
-
-    $sidebar.bind("transitionend", function() {
-        if ($sidebar.width() === 0) {
-            $sidebar.css("display", "none");
-        }
-    });
+        $mainView                   = $(".main-view"),
+        $sidebarResizer             = $(".horz-resizer:first");
 
     $mainView.css("background-color", "#3F3F3F");
     $content.css("background-color", "#ffffff");
 
+    $sidebar.on("panelExpanded", function () {
+        sideBarPlusActive = false;
+        $content.removeClass("sidebarplus-content");
+        $sidebar.removeClass("sidebarplus-sidebar")
+        $sidebarResizer.css("display", "block").css("left", $sidebar.width() + "px");
+
+        panelExpanded();
+    });
+
+    $sidebar.on("panelCollapsed", function () {
+        panelCollapsed();
+    });
+
+    $content.bind("transitionend", function() {
+        if (sideBarCollapse) {
+            $sidebar.css("display", "none");            
+        } else {
+            $sidebar.css("display", "-webkit-box");
+        }
+
+        $("#first-pane").prev(".horz-resizer").css("left", $("#first-pane").width() + "px")
+    });
+    
+    function panelCollapsed() {    
+        sideBarCollapse = true;
+
+        $sidebarResizer.css("display", "none");
+        $sidebar.addClass("sidebarplus-sidebar").css("opacity", "0");
+        $content.addClass("sidebarplus-content").css("left", "20px");
+    }
+
+    function panelExpanded() {
+        sideBarCollapse = false;
+
+        $sidebar.css("opacity", "1");
+        $content.css("left", $sidebar.width() + "px");
+    }
+
+    function collapseSidebar() {
+        if (sideBarPlusActive) {
+            panelCollapsed();
+        }
+    }
+
+    function expandSidebar(event) {
+        if (event.pageX < 19 && $sidebar.is(":visible") === false) {
+            sideBarPlusActive = true;
+            panelExpanded();
+        }
+    }
+
+    function initializeTriggers() {
+        var triggerMode = preference.get("triggermode");
+
+        if (triggerMode === "mouseover") {
+            $content.off("click", collapseSidebar);        
+            $mainView.off("click", expandSidebar);
+
+            $sidebar.on("mouseleave", collapseSidebar);        
+            $mainView.on("mouseover", expandSidebar);
+        } else {
+            //default is click
+            $sidebar.off("mouseleave", collapseSidebar);
+            $mainView.off("mouseover", expandSidebar);
+
+            $content.on("click", collapseSidebar);        
+            $mainView.on("click", expandSidebar);
+        }
+    }
+
+    //while brakets starts
     AppInit.appReady(function () {
         ExtensionUtils.loadStyleSheet(module, "css/main.css");
 
@@ -81,4 +119,10 @@ define(function (require, exports, module) {
             panelCollapsed();            
         }
     });
+
+    //user preference for how to trigger siderbarplus
+    var preference = PreferencesManager.getExtensionPrefs("sidebarplus");
+
+    preference.definePreference("triggermode", "string", "click").on("change", initializeTriggers);
+    preference.save();
 });

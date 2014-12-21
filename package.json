@@ -1,9 +1,9 @@
 {
     "name": "sidebar-plus",
     "title": "Sidebar Plus",
-    "description": "Hide sidebar using View->Hide Sidebar Or Ctrl+Alt+H. For immediate access, click at the left corner to open it and click on editor to collapse it",
+    "description": "Hide sidebar using View->Hide Sidebar Or Ctrl+Alt+H. For immediate access, click at the left corner to open it and click on editor to collapse it. You can also open sidebar by mouse over at the left corner. For that, you should set triggermode in brakets.json preference file.",
     "homepage": "https://github.com/sathyamoorthi/brackets-sidebar-plus",
-    "version": "2.0.0",
+    "version": "2.0.2",
     "author": "Sathyamoorthi<sathyamoorthi10@gmail.com>",
     "files": [
         "main.js",
