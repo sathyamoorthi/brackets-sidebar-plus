@@ -5,12 +5,10 @@ You can hide your sidebar using **View->Hide Sidebar** Or **Ctrl+Alt+H** (Bracke
 
 #### How to set your preference
 1. Open preference file using Debug -> Open Preferences File.
-
 2. Add an option like below. If no preferences specified, "click" will be the default.
 
-a. "sidebarplus.triggermode": "mouseover"
-
-b. "sidebarplus.triggermode": "click"
+* "sidebarplus.triggermode": "mouseover"
+* "sidebarplus.triggermode": "click"
 
 #### Demo
 You can see this [youtube](http://youtu.be/T4X7YIrOBOo) video for demo.
