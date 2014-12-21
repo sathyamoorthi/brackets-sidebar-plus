@@ -114,7 +114,10 @@ define(function (require, exports, module) {
     //while brakets starts
     AppInit.appReady(function () {
         ExtensionUtils.loadStyleSheet(module, "css/main.css");
+    });
 
+    //while brakets starts
+    AppInit.htmlReady(function () {
         if ($sidebar.is(":visible") === false) {
             panelCollapsed();            
         }
